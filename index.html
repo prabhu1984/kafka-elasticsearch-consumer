@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Kafka-elasticsearch-consumer by BigDataDevs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Kafka-elasticsearch-consumer</h1>
+      <h2 class="project-tagline">This project, Kafka Standalone Consumer will read the messages from Kafka, processes and index them in ElasticSearch.</h2>
+      <a href="https://github.com/BigDataDevs/kafka-elasticsearch-consumer" class="btn">View on GitHub</a>
+      <a href="https://github.com/BigDataDevs/kafka-elasticsearch-consumer/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/BigDataDevs/kafka-elasticsearch-consumer/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="welcome-to-the-kafka-elasticsearch-consumer-wiki" class="anchor" href="#welcome-to-the-kafka-elasticsearch-consumer-wiki" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to the kafka-elasticsearch-consumer wiki!</h1>
+
+<h2>
+<a id="illustration-of-kafka-elasticsearch-consumer-usage" class="anchor" href="#illustration-of-kafka-elasticsearch-consumer-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Illustration of kafka-elasticsearch-consumer usage</h2>
+
+<h3>
+<a id="the-consumer-is-positioned-in-the-middle" class="anchor" href="#the-consumer-is-positioned-in-the-middle" aria-hidden="true"><span class="octicon octicon-link"></span></a>The consumer is positioned in the middle.</h3>
+
+<p><img src="https://raw.githubusercontent.com/reachkrishnaraj/kafka-elasticsearch-standalone-consumer/master/img/Kafka_ES_Illustration_New.png" alt=""></p>
+
+<h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
+
+<h3>
+<a id="kafka-standalone-consumer-will-read-the-messages-from-kafka-processes-and-index-them-in-elasticsearch" class="anchor" href="#kafka-standalone-consumer-will-read-the-messages-from-kafka-processes-and-index-them-in-elasticsearch" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Kafka Standalone Consumer will read the messages from Kafka, processes and index them in ElasticSearch.</strong>
+</h3>
+
+<h3>
+<a id="easily-scaleable--extendable-" class="anchor" href="#easily-scaleable--extendable-" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Easily Scaleable &amp; Extendable !</strong>
+</h3>
+
+<h3>
+<a id="as-described-in-the-illustration-above-here-is-how-the-standalone-consumer-works" class="anchor" href="#as-described-in-the-illustration-above-here-is-how-the-standalone-consumer-works" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>As described in the illustration above, here is how the StandAlone Consumer works:</em>
+</h3>
+
+<ul>
+<li><p>Kafka has a topic named, say <code>Topic_1</code></p></li>
+<li><p>Lets say, <code>Topic_1</code> has 5 partitions.</p></li>
+<li><p>Now, there is a needed to read, process the messages from Kafka and ElasticSearch</p></li>
+<li><p>In order to do that, have 5 Config Files and start 5 instances of this Standalone Consumer by tying each config file to the respective Consumer Instance.</p></li>
+<li><p>Now, we will have 5 Consumer Standalone Daemons running, listening &amp; processing messages from each partition of <code>Topic_1</code> in Kafka.</p></li>
+<li><p>When there is a new partitions(say <code>6th partition</code>) in the same <code>Topic_1</code>, then start a new Consumer Daemon instance pointing to the new partition(<code>i.e: 6th partition</code>)</p></li>
+<li><p>This way, there is a clear way of subscribing and processing messages from multiple partitions across multiple topics using this Stand alone Consumer.</p></li>
+</ul>
+
+<h1>
+<a id="how-to-use-" class="anchor" href="#how-to-use-" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use ?</h1>
+
+<h3>
+<a id="method-1-running-as-a-standard-jar" class="anchor" href="#method-1-running-as-a-standard-jar" aria-hidden="true"><span class="octicon octicon-link"></span></a>Method 1: running as a standard Jar</h3>
+
+<p>**1. Download the code into a <code>$CONSUMER_HOME</code> dir.</p>
+
+<p>**2. cp <code>$CONSUMER_HOME</code>/src/main/resources/kafkaESConsumer.properties.template /your/absolute/path/kafkaESConsumer.properties file - update all relevant properties as explained in the comments</p>
+
+<p>**3. cp <code>$CONSUMER_HOME</code>/src/main/resources/logback.xml.template /your/absolute/path/logback.xml</p>
+
+<p>specify directory you want to store logs in:
+    </p>
+
+<p>adjust values of max sizes and number of log files as needed</p>
+
+<p>**4. build/create the app jar:</p>
+
+<pre><code>    cd $CONSUMER_HOME
+    mvn clean package
+
+The kafka-es-consumer-0.2.jar will be created in the $CONSUMER_HOME/bin, with all dependencies included into the JAR
+</code></pre>
+
+<p>**5. run the app [use JDK1.8] :  </p>
+
+<pre><code>    java -Dlogback.configurationFile=/your/absolute/path/logback.xml -jar $CONSUMER_HOME/bin/kafka-es-consumer-0.2.jar /your/absolute/path/kafkaESConsumer.properties
+</code></pre>
+
+<h3>
+<a id="method-2-running-via-jsvc-as-a-daemon" class="anchor" href="#method-2-running-via-jsvc-as-a-daemon" aria-hidden="true"><span class="octicon octicon-link"></span></a>Method 2: running via JSVC as a Daemon</h3>
+
+<p><strong>1. Download the code. Let's say, <code>$CONSUMER_HOME</code> contains the code.</strong></p>
+
+<p><strong>2. From the <code>$CONSUMER_HOME</code>, build the maven project.</strong> - <em>this step will create the JAR file with all Consumer dependencies inside, in the <code>$CONSUMER_HOME/bin</code> directory</em></p>
+
+<pre><code>mvn clean package
+</code></pre>
+
+<p><strong>3. Create a config file for the Consumer Instance and provide all necessary properties.</strong> - <em>Use the existing Config file <code>$CONSUMER_HOME</code>/src/main/resources/kafkaESConsumer.properties.template` as template.</em></p>
+
+<pre><code>cp $CONSUMER_HOME/src/main/resources/kafkaESConsumer.properties $CONSUMER_HOME/config/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties
+
+vi $CONSUMER_HOME/src/main/resources/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties - Edit &amp; provide the correct config details.
+</code></pre>
+
+<p><em>These files will be copied into the $CONSUMER_HOME/bin/classes/ dir after the build.</em>
+<em>The details &amp; guide for each property in the config file is given in the property file itself.</em></p>
+
+<p><strong>4. Start the Consumer as follows:</strong></p>
+
+<pre><code>cd $CONSUMER_HOME/scripts
+
+vi consumerNew.sh
+
+Provide the value for all the below variables:
+
+# Setup variables
+#Set the full path of top directory of this kafka consumer
+base_dir=
+JAVA_HOME=
+#User as which the Consumer Daemon has to be run
+USER=
+
+./consumerNew.sh -p start -c $CONSUMER_HOME/config/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties
+
+# ' -p ' - Can take either start | stop | restart
+
+# ' -c ' - the config file for the consumer instance with path 
+# (e.g: '$CONSUMER_HOME/config/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties')
+</code></pre>
+
+<p><strong>5. Confirm the successful start of the Consumer by looking into:</strong></p>
+
+<p><em>The below log file contains INFO during starting, restarting &amp; stopping the Consumer Instance.</em></p>
+
+<pre><code>#'$consumerGroupName,$topic,$partition' - properties as defined in the consumer instances's config file (i.e: '&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties' in this example
+
+vi $CONSUMER_HOME/processLogs/&lt;$consumerGroupName&gt;_&lt;$topic&gt;_&lt;$partition&gt;.out
+</code></pre>
+
+<p><em>The below log file contains ERROR during starting, restarting &amp; stopping the Consumer Instance.</em></p>
+
+<pre><code>#'$consumerGroupName,$topic,$partition' - properties as defined in the consumer instances's config file (i.e: '&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties' in this example
+
+vi $CONSUMER_HOME/processLogs/&lt;$consumerGroupName&gt;_&lt;$topic&gt;_&lt;$partition&gt;.err
+</code></pre>
+
+<p><strong>6. Monitor the processing in the log file defined by the following property in the Consumer's Respective Config file.</strong></p>
+
+<p><strong>7. To Stop the Consumer Instance:</strong></p>
+
+<pre><code>cd $CONSUMER_HOME/scripts
+
+./consumerNew.sh -p stop -c $CONSUMER_HOME/config/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties
+</code></pre>
+
+<p><strong>8. To Restart the Consumer Instance:</strong></p>
+
+<pre><code>cd $CONSUMER_HOME/scripts
+
+./consumerNew.sh -p restart -c $CONSUMER_HOME/config/&lt;consumerGroupName&gt;&lt;topicName&gt;&lt;PartitionNum&gt;.properties
+</code></pre>
+
+<h1>
+<a id="versions" class="anchor" href="#versions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Versions:</h1>
+
+<h3>
+<a id="kafka-version-0821" class="anchor" href="#kafka-version-0821" aria-hidden="true"><span class="octicon octicon-link"></span></a>Kafka Version: 0.8.2.1</h3>
+
+<h3>
+<a id="elasticsearch--151" class="anchor" href="#elasticsearch--151" aria-hidden="true"><span class="octicon octicon-link"></span></a>ElasticSearch: &gt; 1.5.1</h3>
+
+<h3>
+<a id="scala-version-for-kafka-build-2100" class="anchor" href="#scala-version-for-kafka-build-2100" aria-hidden="true"><span class="octicon octicon-link"></span></a>Scala Version for Kafka Build: 2.10.0</h3>
+
+<h1>
+<a id="configuring-the-consumer-instance" class="anchor" href="#configuring-the-consumer-instance" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the Consumer Instance:</h1>
+
+<p>The details of each config property can be seen in the template file (below)</p>
+
+<p><a href="https://github.com/ppine7/kafka-elasticsearch-standalone-consumer/blob/master/src/main/resources/kafkaESConsumer.properties">Config File with details about each property</a></p>
+
+<h1>
+<a id="message-handler-class" class="anchor" href="#message-handler-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Message Handler Class</h1>
+
+<ul>
+<li><p><code>org.elasticsearch.kafka.consumer.MessageHandler</code> is an Abstract class that has most of the functionality of reading data from Kafka and batch-indexing into ElasticSearch already implemented. It has one abstract method, <code>transformMessage()</code>, that can be overwritten in the concrete sub-classes to customize message transformation before posting into ES</p></li>
+<li><p><code>org.elasticsearch.kafka.consumer.messageHandlers.RawMessageStringHandler</code> is a simple concrete sub-class of the MessageHAndler that sends messages into ES with no additional transformation, as is, in the 'UTF-8' format</p></li>
+<li><p>Usually, its effective to Index the message in JSON format in ElasticSearch. This can be done using a Mapper Class and transforming the message from Kafka by overriding/implementing the <code>transformMessage()</code> method. An example can be found here: <code>org.elasticsearch.kafka.consumer.messageHandlers.AccessLogMessageHandler</code></p></li>
+<li><p><em><strong>Do remember to set the newly created message handler class in the <code>messageHandlerClass</code> config property of the consumer instance.</strong></em></p></li>
+</ul>
+
+<h1>
+<a id="indexhandler-interface-and-basic-implementation" class="anchor" href="#indexhandler-interface-and-basic-implementation" aria-hidden="true"><span class="octicon octicon-link"></span></a>IndexHandler Interface and basic implementation</h1>
+
+<ul>
+<li><p><code>org.elasticsearch.kafka.consumer.IndexHandler</code> is an interface that defines two methods: getIndexName(params) and getIndexType(params). </p></li>
+<li><p><code>org.elasticsearch.kafka.consumer.BasicIndexHandler</code> is a simple imlementation of this interface that returnes indexName and indexType values as configured in the kafkaESConsumer.properties file. </p></li>
+<li><p>one might want to create a custom implementation of IndexHandler if, for example, index name and type are not static for all incoming messages but depend on the event data - for example customerId, orderId, etc. In that case, pass all info that is required to perform that custom index determination logic as a Map of parameters into the getIndexName(params) and getIndexType(params) methods (or pass NULL if no such data is required)</p></li>
+<li><p><em><strong>Do remember to set the index handler class in the <code>indexHandlerClass</code> property in the kafkaESConsumer.properties file. By default, BasicIndexHandler is used</strong></em></p></li>
+</ul>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>kafka-elasticsearch-standalone-consumer</p>
+
+<pre><code>Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+</code></pre>
+
+<h1>
+<a id="contributors" class="anchor" href="#contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributors</h1>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/BigDataDevs/kafka-elasticsearch-consumer">Kafka-elasticsearch-consumer</a> is maintained by <a href="https://github.com/BigDataDevs">BigDataDevs</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-67418806-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
