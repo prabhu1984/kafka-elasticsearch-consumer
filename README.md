@@ -47,10 +47,9 @@
 	If you want to use custom IMessageHandler and/or IIndexHandler classes - specify them in the following config:
 	(make sure to only modify the class name, not the beans' name/scope)
 	
-	<bean id="messageHandler" 
-		class="org.elasticsearch.kafka.indexer.service.impl.BasicMessageHandler"
-		scope="prototype"/>
-    <bean id="indexHandler" class="org.elasticsearch.kafka.indexer.service.impl.BasicIndexHandler"/>
+	 <bean id="messageHandler"
+          class="org.elasticsearch.kafka.indexer.service.impl.examples.SimpleMessageHandlerImpl"
+          scope="prototype"/>
 	
 		
 **5. build the app:
@@ -112,14 +111,15 @@ Message handling can be customized by using IMessageHandler interface and/or Bas
 
 * `org.elasticsearch.kafka.indexer.service.IMessageHandler` is an interface that defines main methods for reading events from Kafka, processing them, and bulk-intexing into ElasticSearch. One can implement all or some of the methods if custom behavior is needed. In most cases, the only method you would want to customize would be the `transformMessage(...)` method
 
-* `org.elasticsearch.kafka.indexer.service.impl.BasicMessageHandler` is a basic implementation of the IMessageHandler interface. It does not modify incoming messages in any way and batch-indexes them into ES as is, in the 'UTF-8' format. 
+* `org.elasticsearch.kafka.indexer.service.impl.examples.SimpleMessageHandlerImpl` is a basic implementation of the IMessageHandler interface. It does not modify incoming messages in any way and batch-indexes them into ES as is, in the 'UTF-8' format. 
 
 
- There are two main approaches to do the customization:
+ Customization:
   
--- Approach #1: implement the IMessageHandler interface, inject the BasicMessageHandler into your implementation class and delegate most of the methods to the BasicMessageHandler class, overwriting only the transformMessage() method (and maybe others on very rare occasions). See `org.elasticsearch.kafka.indexer.service.impl.examples.SimpleMessageHandlerImpl` for an example of such customization. While this approach a slightly more complex than the second one, it provides you with an easy way to mock some or all services while unit testing your custom logic.
+Implement the IMessageHandler interface, inject the ElasticSearchBatchService into your implementation class and delegate most of the methods to the ElasticSearchBatchService class. ElasticSearchBatchService gives you basic batching operations .
 
--- Approach #2: extend the BasicMessageHandler class and overwrite transformMessage() method (and others if needed). See `org.elasticsearch.kafka.indexer.service.impl.examples.RawLogMessageHandlerImpl` for an example of such customization. This is a simpler to implement approach, but is less flexible for Unit testing, since the constructor of the BasicMessageHandler will be called early on.
+See `org.elasticsearch.kafka.indexer.service.impl.examples.SimpleMessageHandlerImpl` for an example of such customization. While this approach a slightly more complex than the second one, it provides you with an easy way to mock some or all services while unit testing your custom logic.
+
 
 
 * _**Do remember to specify your custom message handler class in the kafka-es-context.xml file. By default, BasicMessageHandler will be used**_
@@ -129,11 +129,11 @@ Index and index type management/determination customization can be done by using
 
 * `org.elasticsearch.kafka.indexer.service.IIndexHandler` is an interface that defines two methods: getIndexName(params) and getIndexType(params). You can customize both or either of them as needed 
 
-* `org.elasticsearch.kafka.indexer.service.impl.BasicIndexHandler` is a simple imlementation of this interface that returnes indexName and indexType values as configured in the kafka-es-indexer.properties file. 
+* `org.elasticsearch.kafka.indexer.service.impl.examples.SimpleMessageHandlerImpl` is a simple imlementation of this interface uses  indexName and indexType values as configured in the kafka-es-indexer.properties file. 
 
 * you can either implement the interface or extend the basic impl class - either approach is simple enough
 
-* _**Do remember to specify your custom index handler class in the kafka-es-context.xml file. By default, BasicIndexHandler is used**_
+* _**Do remember to specify your custom index handler class in the kafka-es-context.xml file. By default, SimpleMessageHandlerImpl is used**_
 
 # License
 
